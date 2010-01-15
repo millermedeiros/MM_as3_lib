@@ -118,12 +118,12 @@
 		 * @example	ColorUtils.colorToUint("white") returns 0xFFFFFF
 		 */
 		public static function colorToUint(color:String):uint {
-			if(/rgb\(\d+\,\d+\,\d+\)/.test(color)){
+			if(/^rgb\(\d+\,\d+\,\d+\)/.test(color)){
 				return rgbToUint(color);
-			} else if(/[a-zA-Z]+/.test(color)){
-				return htmlColorToUint(color);
-			} else if(/\#(:?\w{6}|\w{3})/.test(color)) {
+			} else if(/^\#(:?\w{6}|\w{3})/.test(color)) {
 				return hexToUint(color);
+			} else if(/^[a-zA-Z]+/.test(color)){
+				return htmlColorToUint(color);
 			} else {
 				return uint(color);
 			}

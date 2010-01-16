@@ -4,13 +4,14 @@
  * This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
  */
 
- //TODO remove unnecessary lineStyle commands to reduce Motifs size
- //TODO fix spiral fill bug (don't think it's a big problem since spirals aren't commom)
- //TODO support CSS classes (maybe)
- //TODO: IMPLEMENT arc (http://www.w3.org/TR/SVG/implnote.html#ArcImplementationNotes)
+ //TODO: remove unnecessary lineStyle commands to reduce Motifs size
+ //TODO: fix spiral fill bug (don't think it's a big problem since spirals aren't commom)
+ //TODO: support CSS classes (maybe)
+ //TODO: fix filled line bug
  
 package com.millermedeiros.parsers {
 	
+	import com.millermedeiros.geom.Arc;
 	import com.millermedeiros.geom.CubicBezier;
 	import com.millermedeiros.geom.Ellipse;
 	import com.millermedeiros.geom.Line;
@@ -23,6 +24,7 @@ package com.millermedeiros.parsers {
 	import com.millermedeiros.utils.ColorUtils;
 	import com.millermedeiros.utils.GeomUtils;
 	import com.millermedeiros.utils.MatrixUtils;
+	import com.millermedeiros.utils.NumberUtils;
 	import com.millermedeiros.utils.ObjectUtils;
 	import com.millermedeiros.utils.StringUtils;
 	import flash.geom.Matrix;
@@ -205,7 +207,7 @@ package com.millermedeiros.parsers {
 				var fillColor:uint = (att['fill'] != undefined)? ColorUtils.colorToUint(att['fill']) : 0;
 				var fillOpacity:Number = (att['fill-opacity'] != undefined)? att['fill-opacity'] : 1;
 				fillOpacity *= (att['opacity'] != undefined)? att['opacity'] : 1;
-				_motifs.push( ['B', [fillColor, fillOpacity]] );
+				_motifs.push( ['B', [fillColor, NumberUtils.limitPrecision(fillOpacity)]] );
 			}
 			
 			//lineStyle
@@ -217,7 +219,7 @@ package com.millermedeiros.parsers {
 				var caps:String = (att['stroke-linecap'] != undefined && att['stroke-linecap'] != "butt")? att['stroke-linecap'] : "none";
 				var joints:String = (att['stroke-linejoin'] != undefined)? att['stroke-linejoin'] : null;
 				var miterlimit:Number = (att['stroke-miterlimit'] != undefined)? att['stroke-miterlimit'] : 3;
-				_motifs.push( ['S', [thickness, strokeColor, strokeOpacity, false, "normal", caps, joints, miterlimit]] );
+				_motifs.push( ['S', [NumberUtils.limitPrecision(thickness), strokeColor, NumberUtils.limitPrecision(strokeOpacity), false, "normal", caps, joints, miterlimit]] );
 			} else {
 				_motifs.push( ['S', []] );
 			}
@@ -365,9 +367,10 @@ package com.millermedeiros.parsers {
 			
 			for (var i:int = 0; i < n; i++) {
 				temp = StringUtils.trim(StringUtils.removeMultipleSpaces(commands[i]));
+				temp = temp.replace(/([a-zA-Z]) /g, "$1"); //remove space after "command char"
 				temp = StringUtils.removeAllWhiteSpaces(temp, ",");
 				temp = temp.replace(/((?<![a-zA-Z]|,)-)/g, ",$&"); //add "," before all "-" but the ones that already have a comma before it and the ones that are just after a "commmand char"
-				commands[i] = (temp.length > 1)? [temp.substr(0,1), temp.substr(1).split(",")] : [temp.substr(0,1)]; //[command, [params...]]
+				commands[i] = (temp.length > 1)? [temp.substr(0, 1), temp.substr(1).split(",")] : [temp.substr(0, 1)]; //[command, [params...]]
 			}
 			
 			//TODO: TEST close path
@@ -513,8 +516,11 @@ package com.millermedeiros.parsers {
 		private static function pArc(params:Array, isRelative:Boolean = false):void {
 			var end:Point = new Point(params[5], params[6]);
 			if (isRelative)	toAbsolute(end);
-			var arc:SVGArc = new SVGArc(_prevAnchor, end, params[0], params[1], params[2], params[3], params[4]);
-			if (_hasTransform) arc.matrix = _curMatrix;
+			var arc:SVGArc = new SVGArc(_prevAnchor, end, params[0], params[1], params[2], (params[3] == '1'), (params[4] == '1'));
+			if (_hasTransform) {
+				arc.matrix = _curMatrix;
+				end = _curMatrix.transformPoint(end);
+			}
 			_motifs = _motifs.concat(arc.toMotifs(false));
 			_prevAnchor = end;
 		}
@@ -556,13 +562,9 @@ package com.millermedeiros.parsers {
 		 */
 		private static function pLine(endX:Number, endY:Number):void {
 			var p:Point = new Point(endX, endY);
-			if (_hasTransform) {
-				var tp:Point = _curMatrix.transformPoint(p);
-				_motifs.push(['L', [tp.x, tp.y]]);
-			}else {
-				_motifs.push(['L', [p.x, p.y]]);
-			}
-			_prevAnchor = p;
+			_prevAnchor = p; //should be stored before transform
+			if (_hasTransform) p = _curMatrix.transformPoint(p);
+			_motifs.push(['L', [NumberUtils.limitPrecision(p.x), NumberUtils.limitPrecision(p.y)]]);
 		}
 		
 		/**
@@ -570,13 +572,9 @@ package com.millermedeiros.parsers {
 		 */
 		private static function pMove(x:Number, y:Number):void {
 			var p:Point = new Point(x, y);
-			if (_hasTransform) {
-				var tp:Point = _curMatrix.transformPoint(p);
-				_motifs.push(['M', [tp.x, tp.y]]);
-			}else {
-				_motifs.push(['M', [p.x, p.y]]);
-			}
-			_prevAnchor = p;
+			_prevAnchor = p; //should be stored before transform
+			if (_hasTransform) p = _curMatrix.transformPoint(p);
+			_motifs.push(['M', [NumberUtils.limitPrecision(p.x), NumberUtils.limitPrecision(p.y)]]);
 		}
 		
 		/**

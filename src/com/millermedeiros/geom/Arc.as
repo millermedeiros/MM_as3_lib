@@ -119,10 +119,8 @@ package com.millermedeiros.geom {
 			var curves:Array = getCurves();
 			var motifs:Array = [];
 			var t:int = curves.length;
-			var c:QuadraticBezier;
 			for (var i:int = 0; i < t; i++) {
-				c = curves[i].transform(matrix);
-				motifs = motifs.concat(c.toMotifs(!i && moveTo));
+				motifs = motifs.concat(curves[i].toMotifs(!i && moveTo));
 			}
 			if (endFill) motifs.push(['E']);
 			return motifs;
@@ -136,9 +134,11 @@ package com.millermedeiros.geom {
 		 */
 		public static function toEndPoint(a:Arc):Object {
 			
+			//TODO: test toEndPoint conversion
+			
 			var radRotation:Number = GeomUtils.degreeToRadians(a._rotation);
 			var radStart:Number = GeomUtils.degreeToRadians(a._angleStart);
-			var radEnd:Number = GeomUtils.degreeToRadians(a._angleExtent);
+			var radExtent:Number = GeomUtils.degreeToRadians(a._angleExtent);
 			var sinRotation:Number = Math.sin(radRotation);
 			var cosRotation:Number = Math.cos(radRotation);
 			
@@ -149,9 +149,9 @@ package com.millermedeiros.geom {
 			start.y = (sinRotation * rysin) + (cosRotation * rysin) + a._cy;
 			
 			var end:Point = new Point();
-			rxcos = a._rx * Math.cos(radStart + radEnd);
-			rysin = a._ry * Math.sin(radStart + radEnd);
-			end.x = (cosRotation * rxcos) + ( -sinRotation * rxcos) + a._cx;
+			rxcos = a._rx * Math.cos(radStart + radExtent);
+			rysin = a._ry * Math.sin(radStart + radExtent);
+			end.x = (cosRotation * rxcos) + (-sinRotation * rxcos) + a._cx;
 			end.y = (sinRotation * rysin) + (cosRotation * rysin) + a._cy;
 			
 			var isLarge:Boolean = (Math.abs(a._angleExtent) > 180);
@@ -176,6 +176,10 @@ package com.millermedeiros.geom {
 			var a:Arc = new Arc(_cx, _cy, _rx, _ry, _rotation, _angleStart, _angleExtent);
 			a.matrix.concat(this.matrix);
 			return a;
+		}
+		
+		public function toString():String {
+			return "(cx=" + _cx + ", cy=" + _cy +", rx=" + _rx + ", ry=" + _ry + ", rotation=" + _rotation +", angleStart=" + _angleStart +", angleExtent=" + _angleExtent +")";
 		}
 		
 	}

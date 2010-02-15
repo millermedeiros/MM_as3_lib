@@ -20,7 +20,7 @@ package com.millermedeiros.geom {
 	 */
 	public class Ellipse {
 		
-		private static const CONTROL_DISTANCE:Number = (4 * (Math.SQRT2 - 1)) / 3; // Used to find control points position
+		private static const CONTROL_DISTANCE:Number = (4 * (Math.SQRT2 - 1)) / 3; // Used to find control points position (magic number)
 		
 		/// center X
 		public var cx:Number;
@@ -53,11 +53,6 @@ package com.millermedeiros.geom {
 		 * @return Array with 4 CubicBezier curves
 		 */
 		public function getCurves():Array{
-			
-			var cx:Number = cx;
-			var cy:Number = cy;
-			var rx:Number = rx;
-			var ry:Number = ry;
 			
 			var top:Number = cy - ry;
 			var left:Number = cx - rx;

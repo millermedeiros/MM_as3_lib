@@ -134,7 +134,7 @@ package com.millermedeiros.geom {
 		 */
 		public static function toEndPoint(a:Arc):Object {
 			
-			//TODO: test toEndPoint conversion
+			//TODO: test toEndPoint conversion (not sure if it works)
 			
 			var radRotation:Number = GeomUtils.degreeToRadians(a._rotation);
 			var radStart:Number = GeomUtils.degreeToRadians(a._angleStart);

@@ -3,7 +3,8 @@
 	/**
 	 * StringUtils - Useful functions for string formating
 	 * @author Miller Medeiros (http://www.millermedeiros.com)
-	 * @version	0.5.2 (2010/02/09)
+	 * @version	0.5
+	 * @since	2009/09/18
 	 */
 	public class StringUtils {
 		
@@ -70,7 +71,7 @@
 			function capsFn():String {
 				return arguments[0].toUpperCase();
 			}
-			return str.toLowerCase().replace(/^[a-z\xE0-\xFF]|\s[a-z\xE0-\xFF]/g, capsFn); //replaces first letter of each word
+			return str.replace(/^[a-z\xE0-\xFF]|\s[a-z\xE0-\xFF]/g, capsFn); //replaces first letter of each word (only lower case letters)
 		}
 		
 		/**

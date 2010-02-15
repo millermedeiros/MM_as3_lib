@@ -5,8 +5,8 @@
 	/**
 	 * ArrayUtils
 	 * @author Miller Medeiros (http://www.millermedeiros.com)
-	 * @version	0.1
-	 * @since	2009/07/27
+	 * @version	0.2
+	 * @since	2010/02/14
 	 */
 	public class ArrayUtils {
 		
@@ -78,6 +78,25 @@
 			}
 			arr.forEach(checkType);
 			return str + "]";
+		}
+		
+		/**
+		 * Compare 2 Arrays
+		 * - Check if items are on the same order and has the same type and value.
+		 * @param	arr1	Array #1
+		 * @param	arr2	Array #2
+		 * @return	If Arrays contains same values
+		 */
+		public static function compare(arr1:Array, arr2:Array):Boolean{
+			if(arr1.length != arr2.length){
+				return false;
+			}else{
+				var n:int = arr1.length;
+				for(var i:int = 0; i < n; i++){
+					if(arr1[i] !== arr2[i]) return false;
+				}
+			}
+			return true;
 		}
 		
 	}

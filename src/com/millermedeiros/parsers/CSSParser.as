@@ -1,4 +1,9 @@
-﻿package com.millermedeiros.parsers {
+﻿/**
+ * Copyright (c) 2009 Miller Medeiros <http://www.millermedeiros.com/>
+ * This software is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
+ */
+
+package com.millermedeiros.parsers {
 	
 	import com.millermedeiros.utils.StringUtils;
 	
